@@ -29,7 +29,7 @@ PingGuard monitors your network connection by periodically pinging a target IP a
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/PingGuard.git
+git clone https://github.com/JevonFunay/PingGuard.git
 cd PingGuard
 
 # Run the application

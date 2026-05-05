@@ -1,4 +1,4 @@
-# 🛡️ PingGuard
+# PingGuard
 
 **Real-time network latency monitor with native Windows notifications.**
 

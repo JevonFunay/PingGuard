@@ -9,7 +9,7 @@ PingGuard monitors your network connection by periodically pinging a target IP a
 ![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-## ✨ Features
+## Features
 
 - **Live Monitoring** — Ping any IP/hostname at configurable intervals
 - **Spike Detection** — Alerts when latency exceeds your threshold
@@ -20,7 +20,7 @@ PingGuard monitors your network connection by periodically pinging a target IP a
 - **Dual-Locale Ping Parser** — Handles both English (`time=`) and Indonesian (`waktu=`) Windows output
 - **Memory Optimized** — Runs at ~100-130MB with SerialGC and capped heap
 
-## 📋 Prerequisites
+## Prerequisites
 
 - **Java JDK 21+** (tested on JDK 25 Adoptium Temurin)
 - **Windows OS** (uses native `ping.exe` and `SystemTray`)
@@ -38,7 +38,7 @@ cd PingGuard
 
 > First run will download Maven dependencies (~50MB). Subsequent runs are instant.
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 pingguard/
@@ -67,7 +67,7 @@ pingguard/
             └── app-icon.png             # App icon
 ```
 
-## 🎯 How It Works
+## How It Works
 
 1. **Start** — Enter target IP, latency threshold (ms), and ping interval (s)
 2. **Monitor** — Background thread pings using native `ping -n 1` via `ProcessBuilder`
@@ -76,7 +76,7 @@ pingguard/
 5. **Background** — Close window → app hides to tray, monitoring continues
 6. **Exit** — Only the "Exit Application" button fully terminates the app
 
-## ⚙️ Configuration
+## Configuration
 
 Settings are auto-saved at `%USERPROFILE%\.pingguard\config.properties`:
 
@@ -86,13 +86,13 @@ Settings are auto-saved at `%USERPROFILE%\.pingguard\config.properties`:
 | `threshold.ms` | `100` | Max acceptable latency (ms) |
 | `interval.seconds` | `5` | Time between pings (seconds) |
 
-## 🧠 Architecture
+## Architecture
 
 - **MVC Pattern** — Clean separation of Model, View (FXML), and Controller
 - **ProcessBuilder** over `InetAddress.isReachable()` — Firewall-friendly, returns actual latency
 - **ScheduledExecutorService** — Daemon thread with fixed delay to prevent overlap
 - **Platform.setImplicitExit(false)** — Keeps app alive when window is hidden
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License.

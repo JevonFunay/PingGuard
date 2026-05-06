@@ -1,4 +1,4 @@
-package com.gabut.pingguard.model;
+package com.pingguard.model;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,7 +33,6 @@ public class PingStat {
         this.isTimeout = (latencyMs == RTO);
     }
 
-    // --- Getters ---
 
     public String getTargetIp() {
         return targetIp;

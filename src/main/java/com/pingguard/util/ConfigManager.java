@@ -1,6 +1,6 @@
-package com.gabut.pingguard.util;
+package com.pingguard.util;
 
-import com.gabut.pingguard.model.AppConfig;
+import com.pingguard.model.AppConfig;
 
 import java.io.*;
 import java.nio.file.*;

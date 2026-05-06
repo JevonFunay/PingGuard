@@ -1,98 +1,58 @@
 # PingGuard
 
-**Real-time network latency monitor with native Windows notifications.**
+PingGuard is a lightweight, real-time network latency monitoring tool designed with native Windows notifications and background execution capabilities.
 
-PingGuard monitors your network connection by periodically pinging a target IP address. When latency exceeds your defined threshold or the connection drops, it sends a **native Windows toast notification** — even when minimized to the system tray.
+It continuously monitors the network connection by periodically sending ICMP echo requests to a specified target. If the latency exceeds a user-defined threshold, or if the connection times out, PingGuard alerts the user via a native Windows toast notification.
 
-![Java](https://img.shields.io/badge/Java-21%2B-orange?logo=openjdk)
-![JavaFX](https://img.shields.io/badge/JavaFX-21-blue?logo=java)
-![Platform](https://img.shields.io/badge/Platform-Windows-0078D6?logo=windows)
-![License](https://img.shields.io/badge/License-MIT-green)
+## Key Features
 
-## Features
+- Continuous Network Monitoring
+  Monitors the connection by pinging any valid IP address or hostname at configurable intervals.
 
-- **Live Monitoring** — Ping any IP/hostname at configurable intervals
-- **Spike Detection** — Alerts when latency exceeds your threshold
-- **Native Notifications** — Windows toast popups via `SystemTray` (no JavaFX UI needed)
-- **Background Mode** — Closing the window hides to system tray, monitoring continues
-- **Tray Integration** — Double-click tray icon to reopen, right-click for menu
-- **Config Persistence** — Settings auto-saved to `~/.pingguard/config.properties`
-- **Dual-Locale Ping Parser** — Handles both English (`time=`) and Indonesian (`waktu=`) Windows output
-- **Memory Optimized** — Runs at ~100-130MB with SerialGC and capped heap
+- Spike and Timeout Detection
+  Automatically detects network latency spikes and Request Timed Out (RTO) errors, triggering alerts when the latency exceeds the maximum threshold.
 
-## Prerequisites
+- Native Windows Notifications
+  Integrates seamlessly with the Windows operating system to display toast popups through the System Tray interface.
 
-- **Java JDK 21+** (tested on JDK 25 Adoptium Temurin)
-- **Windows OS** (uses native `ping.exe` and `SystemTray`)
+- Background Execution Mode
+  Supports running continuously in the background. Closing the main application window minimizes the application to the system tray, allowing the monitoring loop to persist without consuming desktop space.
 
-## 🚀 Quick Start
+- Configuration Persistence
+  Application settings and target configurations are automatically saved to the local file system (config.properties) and restored on startup.
 
-```bash
-# Clone the repository
-git clone https://github.com/JevonFunay/PingGuard.git
-cd PingGuard
+- Minimal Resource Footprint
+  Optimized for low memory consumption using targeted JVM tuning parameters and the Serial Garbage Collector.
 
-# Run the application
-.\run.cmd
-```
+## System Requirements
 
-> First run will download Maven dependencies (~50MB). Subsequent runs are instant.
+- Java Runtime Environment 21 or higher
+- Microsoft Windows OS (Utilizes native Windows ICMP tools and System Tray APIs)
 
 ## Project Structure
 
-```
-pingguard/
-├── pom.xml                              # Maven build config
-├── run.cmd                              # One-click run script
-├── build.cmd                            # Build JAR script
-└── src/main/
-    ├── java/com/gabut/pingguard/
-    │   ├── App.java                     # Entry point + tray lifecycle
-    │   ├── controller/
-    │   │   └── MainController.java      # UI events & ping callbacks
-    │   ├── model/
-    │   │   ├── AppConfig.java           # Configuration data
-    │   │   └── PingStat.java            # Ping result data
-    │   ├── service/
-    │   │   ├── PingEngine.java          # Native CMD ping + regex parser
-    │   │   └── BackgroundTask.java      # ScheduledExecutor ping loop
-    │   └── util/
-    │       ├── SystemTrayUtil.java       # Windows tray + notifications
-    │       └── ConfigManager.java        # .properties persistence
-    └── resources/
-        ├── fxml/
-        │   ├── MainWindow.fxml          # UI layout
-        │   └── style.css                # Dark theme
-        └── icon/
-            └── app-icon.png             # App icon
-```
+The project is structured according to standard Maven conventions:
 
-## How It Works
+- pom.xml: Maven configuration and dependencies
+- build.cmd: Script to compile and package the application into a JAR file
+- build-exe.cmd: Script to bundle the application and Java Runtime into a standalone Windows Executable (.exe)
+- run.cmd: Convenience script to execute the application locally
+- src/main/java/com/pingguard/: Application source code and architecture
 
-1. **Start** — Enter target IP, latency threshold (ms), and ping interval (s)
-2. **Monitor** — Background thread pings using native `ping -n 1` via `ProcessBuilder`
-3. **Detect** — Regex parses output for latency values
-4. **Alert** — Native Windows toast notification on spike or timeout
-5. **Background** — Close window → app hides to tray, monitoring continues
-6. **Exit** — Only the "Exit Application" button fully terminates the app
+## Compilation and Execution
 
-## Configuration
+To run the application from the source code, execute the provided script:
+> .\run.cmd
 
-Settings are auto-saved at `%USERPROFILE%\.pingguard\config.properties`:
+To build a standalone Windows Executable (.exe) that bundles the Java Runtime:
+> .\build-exe.cmd
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `target.ip` | `8.8.8.8` | IP address or hostname to ping |
-| `threshold.ms` | `100` | Max acceptable latency (ms) |
-| `interval.seconds` | `5` | Time between pings (seconds) |
+Once the executable build completes, the compiled application will be located in the `dist\PingGuard` directory. You can distribute this directory as a standalone application.
 
-## Architecture
+## Architecture and Design
 
-- **MVC Pattern** — Clean separation of Model, View (FXML), and Controller
-- **ProcessBuilder** over `InetAddress.isReachable()` — Firewall-friendly, returns actual latency
-- **ScheduledExecutorService** — Daemon thread with fixed delay to prevent overlap
-- **Platform.setImplicitExit(false)** — Keeps app alive when window is hidden
+PingGuard implements the Model-View-Controller (MVC) design pattern to ensure a clean separation between the graphical interface, application state, and core business logic.
 
-## License
-
-This project is licensed under the MIT License.
+- Network requests are delegated to the native operating system's ICMP implementation via ProcessBuilder to ensure accuracy and firewall compliance.
+- Background execution and scheduling are managed by a daemonized ScheduledExecutorService, ensuring that polling intervals are strictly respected without blocking the main interface thread.
+- SystemTray integration allows the JavaFX interface to be detached and re-attached dynamically.

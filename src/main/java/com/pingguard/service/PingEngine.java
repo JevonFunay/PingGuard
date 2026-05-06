@@ -1,6 +1,6 @@
-package com.gabut.pingguard.service;
+package com.pingguard.service;
 
-import com.gabut.pingguard.model.PingStat;
+import com.pingguard.model.PingStat;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -42,7 +42,6 @@ public class PingEngine {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                // Check for timeout or unreachable
                 if (line.contains("Request timed out")
                         || line.contains("Destination host unreachable")
                         || line.contains("Habis waktu")
@@ -52,7 +51,6 @@ public class PingEngine {
                     return new PingStat(ipAddress, PingStat.RTO);
                 }
 
-                // Try to extract latency using regex
                 Matcher matcher = LATENCY_PATTERN.matcher(line);
                 if (matcher.find()) {
                     int latency = Integer.parseInt(matcher.group(1));
@@ -66,7 +64,6 @@ public class PingEngine {
             System.err.println("PingEngine error: " + e.getMessage());
         }
 
-        // If no latency found and no explicit timeout message, treat as RTO
         return new PingStat(ipAddress, PingStat.RTO);
     }
 

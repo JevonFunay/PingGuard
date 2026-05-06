@@ -1,4 +1,4 @@
-package com.gabut.pingguard.model;
+package com.pingguard.model;
 
 /**
  * Model class representing the user's monitoring configuration.
@@ -32,7 +32,6 @@ public class AppConfig {
         this.intervalSeconds = intervalSeconds;
     }
 
-    // --- Getters & Setters ---
 
     public String getTargetIp() {
         return targetIp;

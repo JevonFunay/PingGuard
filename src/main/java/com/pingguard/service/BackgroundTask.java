@@ -1,7 +1,7 @@
-package com.gabut.pingguard.service;
+package com.pingguard.service;
 
-import com.gabut.pingguard.model.AppConfig;
-import com.gabut.pingguard.model.PingStat;
+import com.pingguard.model.AppConfig;
+import com.pingguard.model.PingStat;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,7 +41,7 @@ public class BackgroundTask {
         running = true;
         scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
             Thread t = new Thread(r, "PingGuard-Worker");
-            t.setDaemon(true); // Allow JVM to exit if main thread exits
+            t.setDaemon(true);
             return t;
         });
 
@@ -54,10 +54,9 @@ public class BackgroundTask {
             }
         };
 
-        // Schedule with fixed delay to avoid overlapping executions
         scheduler.scheduleWithFixedDelay(
                 pingTask,
-                0, // Start immediately
+                0,
                 config.getIntervalSeconds(),
                 TimeUnit.SECONDS
         );

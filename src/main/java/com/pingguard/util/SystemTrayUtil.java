@@ -1,4 +1,4 @@
-package com.gabut.pingguard.util;
+package com.pingguard.util;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -26,14 +26,12 @@ public class SystemTrayUtil {
             return;
         }
 
-        // Load icon from resources
         Image image = Toolkit.getDefaultToolkit()
                 .getImage(getClass().getResource("/icon/app-icon.png"));
 
         trayIcon = new TrayIcon(image, "PingGuard - Network Monitor");
         trayIcon.setImageAutoSize(true);
 
-        // Build right-click popup menu
         PopupMenu popup = new PopupMenu();
 
         MenuItem openItem = new MenuItem("Open PingGuard");
@@ -54,7 +52,6 @@ public class SystemTrayUtil {
         popup.add(exitItem);
         trayIcon.setPopupMenu(popup);
 
-        // Double-click listener to re-open the main window
         trayIcon.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

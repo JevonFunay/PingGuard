@@ -1,9 +1,9 @@
-package com.gabut.pingguard.controller;
-import com.gabut.pingguard.model.AppConfig;
-import com.gabut.pingguard.model.PingStat;
-import com.gabut.pingguard.service.BackgroundTask;
-import com.gabut.pingguard.util.ConfigManager;
-import com.gabut.pingguard.util.SystemTrayUtil;
+package com.pingguard.controller;
+import com.pingguard.model.AppConfig;
+import com.pingguard.model.PingStat;
+import com.pingguard.service.BackgroundTask;
+import com.pingguard.util.ConfigManager;
+import com.pingguard.util.SystemTrayUtil;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -21,7 +21,6 @@ import java.util.ResourceBundle;
  */
 public class MainController implements Initializable {
 
-    // --- FXML Components ---
     @FXML private Label statusLabel;
     @FXML private Label statusIndicator;
     @FXML private Label latencyLabel;
@@ -38,10 +37,8 @@ public class MainController implements Initializable {
     @FXML private TextArea logArea;
     @FXML private VBox settingsPane;
 
-    // --- Dependencies ---
     private SystemTrayUtil trayUtil;
 
-    // --- State ---
     private BackgroundTask backgroundTask;
     private AppConfig currentConfig;
     private int totalPings = 0;
@@ -52,15 +49,12 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Load saved configuration
         currentConfig = ConfigManager.load();
 
-        // Populate fields with loaded config
         ipField.setText(currentConfig.getTargetIp());
         thresholdField.setText(String.valueOf(currentConfig.getThresholdMs()));
         intervalField.setText(String.valueOf(currentConfig.getIntervalSeconds()));
 
-        // Initial UI state
         stopButton.setDisable(true);
         logArea.setEditable(false);
         logArea.setWrapText(true);
@@ -76,16 +70,12 @@ public class MainController implements Initializable {
         this.trayUtil = trayUtil;
     }
 
-    // ========================================
-    // FXML Event Handlers
-    // ========================================
 
     /**
      * Handles the "Start Monitoring" button click.
      */
     @FXML
     private void onStartMonitoring() {
-        // Validate inputs
         String ip = ipField.getText().trim();
         if (ip.isEmpty()) {
             showAlert("Validation Error", "Target IP cannot be empty.");
@@ -110,16 +100,13 @@ public class MainController implements Initializable {
             return;
         }
 
-        // Build and save config
         currentConfig = new AppConfig(ip, threshold, interval);
         ConfigManager.save(currentConfig);
 
-        // Reset counters
         totalPings = 0;
         spikeCount = 0;
         rtoCount = 0;
 
-        // Update UI state
         startButton.setDisable(true);
         stopButton.setDisable(false);
         setFieldsEditable(false);
@@ -129,7 +116,6 @@ public class MainController implements Initializable {
                 + " | Threshold: " + threshold + "ms"
                 + " | Interval: " + interval + "s");
 
-        // Start background task
         backgroundTask = new BackgroundTask();
         backgroundTask.start(currentConfig, this::onPingResult);
     }
@@ -177,9 +163,6 @@ public class MainController implements Initializable {
         });
     }
 
-    // ========================================
-    // Callback from BackgroundTask
-    // ========================================
 
     /**
      * Called from the background thread each time a ping completes.
@@ -190,13 +173,11 @@ public class MainController implements Initializable {
             totalPings++;
 
             if (stat.isTimeout()) {
-                // RTO detected
                 rtoCount++;
                 updateStatusUI(true, stat);
                 appendLog("❌ [" + stat.getFormattedTime() + "] "
                         + stat.getTargetIp() + " → RTO / Unreachable");
 
-                // Send native notification for RTO
                 if (trayUtil != null) {
                     trayUtil.showNotification(
                             "⚠ Connection Lost!",
@@ -205,14 +186,12 @@ public class MainController implements Initializable {
                     );
                 }
             } else if (stat.getLatencyMs() > currentConfig.getThresholdMs()) {
-                // Spike detected
                 spikeCount++;
                 updateStatusUI(true, stat);
                 appendLog("⚠ [" + stat.getFormattedTime() + "] "
                         + stat.getTargetIp() + " → " + stat.getLatencyMs() + "ms"
                         + " (SPIKE! Threshold: " + currentConfig.getThresholdMs() + "ms)");
 
-                // Send native notification for spike
                 if (trayUtil != null) {
                     trayUtil.showNotification(
                             "🔺 Ping Spike Detected!",
@@ -223,22 +202,17 @@ public class MainController implements Initializable {
                     );
                 }
             } else {
-                // Normal ping
                 updateStatusUI(true, stat);
                 appendLog("✅ [" + stat.getFormattedTime() + "] "
                         + stat.getTargetIp() + " → " + stat.getLatencyMs() + "ms");
             }
 
-            // Update counter labels
             pingCountLabel.setText(String.valueOf(totalPings));
             spikeCountLabel.setText(String.valueOf(spikeCount));
             rtoCountLabel.setText(String.valueOf(rtoCount));
         });
     }
 
-    // ========================================
-    // UI Helper Methods
-    // ========================================
 
     /**
      * Updates the status indicator and latency display.
@@ -285,7 +259,6 @@ public class MainController implements Initializable {
         }
     }
 
-    // Maximum number of lines kept in the log area to prevent memory growth
     private static final int MAX_LOG_LINES = 200;
 
     /**
@@ -295,7 +268,6 @@ public class MainController implements Initializable {
     private void appendLog(String message) {
         logArea.appendText(message + "\n");
 
-        // Trim old log entries to prevent unbounded memory growth
         String text = logArea.getText();
         int lineCount = 0;
         int idx = text.length();
